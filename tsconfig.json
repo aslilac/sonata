@@ -1,0 +1,10 @@
+{
+	"extends": "@mckayla/tsconfig",
+	"compilerOptions": {
+		"outDir": "./build/",
+		"types": [],
+		"baseUrl": ".",
+		"jsx": "react-jsx"
+	},
+	"include": ["./**/*"]
+}

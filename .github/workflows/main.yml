@@ -1,0 +1,41 @@
+name: main
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["**"]
+
+concurrency:
+  group: main-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with: 18.x
+
+      - run: echo "::set-output name=location::$(yarn cache dir)"
+        id: yarn-cache
+        shell: bash
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ steps.yarn-cache.outputs.location }}
+          key: build-yarn-${{ hashFiles('./yarn.lock') }}
+          restore-keys: build-yarn-
+
+      - run: |
+          yarn
+          git diff --exit-code
+
+      - run: yarn prettier --check .
+
+      - run: yarn lint
+      - run: yarn test
+      - run: yarn build
